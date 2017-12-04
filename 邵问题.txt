@@ -1,0 +1,74 @@
+
+
+一、必做题
+
+1、 键盘输入若干整数，分别插入set和multiset，并显示它们；
+
+2、 键盘输入整数x、y，要求(x<=y)，对1题的两个集合使用lower_bound和upper_bound分别求出[x,y]间的所有整数并输出；
+
+3、 对两个集合，删除2题得到的[x,y]间数据；
+
+4、 建立map< string , int > m，插入下列数据，显示结果：
+
+  student_one   1
+
+  student_three  3
+
+  student_two   2
+
+  student_one   10
+
+要求分别使用inert和 [] 实现插入。
+
+附：pair的使用：
+
+pair<T1,T2> p1(v1,v2);  //用v1、v2构造一pair对象p1
+
+pair<T1,T2>(v1,v2);     //用v1、v2构造一临时pair对象
+
+make_pair(v1,v2);       //用v1、v2生成一临时pair对象
+
+p.first;
+p.second;
+
+5、 在第4题的基础上，自己练习查询类成员函数的使用，包括下列成员函数。
+
+（1）    find
+
+（2）    equal_range
+
+（3）    count   
+
+
+
+
+二、选做题： 
+
+    输入若干单词，单词之间的分隔符可以是任意的标点符号或空格。对每个单词，看它的等同单词在所有输入的单词中是否出现过，若没有出现，就输出原单词。所有要输出的单词按字典序顺序输出。
+
+等同单词是指多个单词包含的字符完全相同，如abc、bac、acb是等同单词。
+
+例如：
+
+输入数据：abc,wes,fdf,bca . ccd
+
+输出：
+
+ccd
+
+fdf
+
+wes 
+
+
+
+
+解题思路：
+
+（1）处理输入字符串得到多个单词；
+
+（2）建立一multimap<string,string>，对每个单词，键为排序后得到的单词(newWord)，值为原单词(word)；（排序使用算法sort对单词word中的字符排序）
+
+（3）把multimap中newWord出现次数为1的word插入set<string>；
+
+（4）最后输出set即可。
