@@ -35,6 +35,8 @@ git branch相关：
 git rm相关：
 $ git rm --cached test.txt（移出暂存区，但是不删除文件，变为untrack状态）
 $ git rm -f test.txt（移出暂存区，同时删除文件）
+$ git rm --cached . -r（移除所有跟踪的文件）
+
 
 
 git push/fetch/pull远程库相关：
