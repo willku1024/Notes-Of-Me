@@ -1,3 +1,7 @@
+---
+
+---
+
 # Python高级
 
 #### 1、模块重载入
@@ -185,7 +189,7 @@ test3()  # 打印顺序见step的顺序
 
 ##### 例1:无参数的函数
 
-```
+```python
 from time import ctime, sleep
 
 def timefun(func):
@@ -206,7 +210,7 @@ foo()
 
 上面代码理解装饰器执行行为可理解成
 
-```
+```python
 foo = timefun(foo)
 #foo先作为参数赋值给func后,foo接收指向timefun返回的wrappedfunc
 foo()
@@ -217,7 +221,7 @@ foo()
 
 ##### 例2:被装饰的函数有参数
 
-```
+```python
 from time import ctime, sleep
 
 def timefun(func):
@@ -234,12 +238,11 @@ def foo(a, b):
 foo(3,5)
 sleep(2)
 foo(2,4)
-
 ```
 
 ##### 例3:被装饰的函数有不定长参数
 
-```
+```python
 from time import ctime, sleep
 
 def timefun(func):
@@ -260,7 +263,7 @@ foo(2,4,9)
 
 ##### 例4:装饰器中的return
 
-```
+```python
 from time import ctime, sleep
 
 def timefun(func):
@@ -288,7 +291,7 @@ print(getInfo())
 
 执行结果:
 
-```
+```python
 foo called at Fri Nov  4 21:55:35 2016
 I am foo
 foo called at Fri Nov  4 21:55:37 2016
@@ -300,7 +303,7 @@ None
 
 如果修改装饰器为`return func()`，则运行结果：
 
-```
+```python
 foo called at Fri Nov  4 21:55:57 2016
 I am foo
 foo called at Fri Nov  4 21:55:59 2016
@@ -316,7 +319,7 @@ getInfo called at Fri Nov  4 21:55:59 2016
 
 ##### 例5：装饰器添加外部参数
 
-```
+```python
 #decorator2.py
 
 from time import ctime, sleep
@@ -358,7 +361,7 @@ foo()==timefun_arg("itcast")(foo)()
 
 装饰器函数其实是这样一个接口约束，它必须接受一个callable对象作为参数，然后返回一个callable对象。在Python中一般callable对象都是函数，但也有例外。只要某个对象重写了 `__call__()` 方法，那么这个对象就是callable的。
 
-```
+```python
 class Test():
     def __call__(self):
         print('call me!')
@@ -370,7 +373,7 @@ t()  # call me
 
 类装饰器demo
 
-```
+```python
 class Test(object):
     def __init__(self, func):
         print("---初始化---")
@@ -400,9 +403,147 @@ showpy()#如果把这句话注释，重新运行程序，依然会看到"--初�
 
 运行结果如下：
 
-```
+```python
 ---初始化---
 func name is test
 ---装饰器中的功能---
 ----test---
 ```
+
+
+
+#### 8、元类
+
+- 认识元类
+
+（1）python2中
+
+```python
+#-*- coding:utf-8 -*-
+def upper_attr(future_class_name, future_class_parents, future_class_attr)
+	#遍历属性字典，把不是__开头的属性名字变为写
+	newAttr = {}
+	for name,value in future_class_attr.items():
+		if not name.startswith("__"):
+			newAttr[name.upper()] = value
+	#调用type来创建类
+	return type(future_class_name, future_class_parents, newAttr)
+
+class Foo(object):
+	__metaclass__ = upper_attr #设置Foo类的元类为upper_attr
+	bar = 'bip'
+
+print(hasattr(Foo, 'bar'))
+print(hasattr(Foo, 'BAR'))
+f = Foo()
+print(f.BAR)
+```
+
+（2）python3中
+
+```python
+#-*- coding:utf-8 -*-
+def upper_attr(future_class_name, future_class_parents, future_class_attr)
+    #遍历属性字典，把不是__开头的属性名字变为大写
+    newAttr = {}
+    for name,value in future_class_attr.items():
+        if not name.startswith("__"):
+        	newAttr[name.upper()] = value
+    #调用type来创建类
+    return type(future_class_name, future_class_parents, newAttr)
+
+class Foo(object, metaclass=upper_attr):
+    bar = 'bip'
+    
+print(hasattr(Foo, 'bar'))
+print(hasattr(Foo, 'BAR'))
+f = Foo()
+print(f.BAR)
+```
+
+- 正式的元类
+
+```python
+#coding=utf-8
+class UpperAttrMetaClass(type):
+    # __new__ 是在__init__之前被调用的特殊方法
+    # __new__是来创建对象并返回之的方法
+    # __init__只是用来将传递的参数初始化给对象
+    # 你很少用到__new__，除非你希望能够控制对象的创建
+    # 创建的对象是类，我们希望能够自定义它，所以我们改写__new__
+    # 如果你希望的话，你也可以在__init__中做些事情
+    # 还有一些高级的方法会涉及到改写__call__特殊方法，但是我们这里不需要
+    def __new__(cls, future_class_name, future_class_parents, future_class_attr)
+    #遍历属性字典，把不是__开头的属性名字变为⼤写
+        newAttr = {}
+        for name,value in future_class_attr.items():
+        if not name.startswith("__"):
+        newAttr[name.upper()] = value
+        # 方法1：通过'type'来做类对象的创建
+        # return type(future_class_name, future_class_parents, newAttr)
+        # 方法2：复用type.__new__
+        # 这就是基本的OOP编程，没什么魔法
+        # return type.__new__(cls, future_class_name, future_class_parents, newAttr)
+        # 方法3：使用super
+        return super(UpperAttrMetaClass, cls).__new__(cls, future_class_name,
+                                                      future_class_parents, newAttr)
+#python2
+class Foo(object):
+    __metaclass__ = UpperAttrMetaClass
+    bar = 'bip'
+    
+# python3
+# class Foo(object, metaclass = UpperAttrMetaClass):
+# 	bar = 'bip'
+
+print(hasattr(Foo, 'bar'))
+# 输出: False
+print(hasattr(Foo, 'BAR'))
+# 输出:True
+f = Foo()
+print(f.BAR)
+# 输出:'bip'
+```
+
+
+
+#### 9、getattribute
+
+```python
+class Person(object):
+    def __getattribute__(self,attr):
+        if obj.startwith("t"):
+            return "haha"
+        else:
+            tmp = object.__getattribute__(self, attr)
+            return tmp
+        
+        def show():
+            print("show")
+ 
+p = Person()
+p.test()
+p.show()
+```
+
+#### 
+
+#### 10、PDB的使用
+
+> 显示当前的代码：l--->list  
+>
+> 向下执行一行代码：n--->next 
+>
+> 继续执行代码：c--->continue 
+>
+> 添加断点：b--->break 
+>
+> 删除断点：clear [break num]    
+>
+> 进入到一个函数：s--->step 
+>
+> 打印所有的形参数据：a--->args 
+>
+> 打印变量 ：p [arg]  
+>
+> 退出调试：q

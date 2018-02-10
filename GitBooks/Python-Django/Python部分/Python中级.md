@@ -172,6 +172,54 @@ print(result)
 
   ​
 
+- 绑定方法
+
+
+```python
+class Person(object):
+    def __init__(self, name):
+        self.name = name
+	def eat(self):
+        print("%s is eating...",self.name)
+        
+def run(self):
+    print("%s is running...",self.name)
+    
+@staticmethod
+def test1():
+    print('test...')
+
+@classmethod
+def test2(cls):
+    print('test...%s', cls.age)
+    
+p1 = Person("will")
+Person.age = 10
+import types
+p1.run = types.MethodType(run, p1) # 绑定实例方法
+p1.test1 = test1 # 绑定静态方法
+p1.test2 = test2 # 绑定类方法
+p1.run()      
+p1.test1()      
+p1.test2()   
+```
+
+- 限制绑定\_\_slot\_\_(不会被继承)
+
+```python
+>>> class Person(object):
+		__slots__ = ("name", "age")
+>>> P = Person()
+>>> P.name = "⽼王"
+>>> P.age = 20
+>>> P.score = 100
+Traceback (most recent call last):
+File "<pyshell#3>", line 1, in <module>
+AttributeError: Person instance has no attribute 'score'
+>>>
+```
+
+
 
 ##### (2)异常
 

@@ -137,3 +137,7 @@ random模块
 
 
 
+
+#### 5、作用域
+
+> 遵循LEGB原则：local-->enclosing function-->global-->build in
