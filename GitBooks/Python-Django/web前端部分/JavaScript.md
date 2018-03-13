@@ -632,4 +632,274 @@ alert( parseInt('abc123') );  // 弹出Na
 
 
 
-#### 3、
+#### 3、闭包
+
+**什么是闭包 **
+函数嵌套函数，内部函数可以引用外部函数的参数和变量，参数和变量不会被垃圾回收机制收回
+
+##### （1）示例
+
+```
+function aaa(a){      
+      var b = 5;      
+      function bbb(){
+           a++;
+           b++;
+         alert(a);
+         alert(b);
+      }
+      return bbb;
+  }
+
+ var ccc = aaa(2);
+
+ ccc();
+ ccc();
+
+```
+
+改写成封闭函数的形式：
+
+```
+var ccc = (function(a){
+
+  var b = 5;
+  function bbb(){
+       a++;
+       b++;
+     alert(a);
+     alert(b);
+  }
+  return bbb;
+
+})(2);
+
+ccc();
+ccc();
+
+
+```
+
+##### （2）用处 
+
+- 将一个变量长期驻扎在内存当中，可用于循环中存索引值
+
+```
+<script type="text/javascript">
+    window.onload = function(){
+        var aLi = document.getElementsByTagName('li');
+        for(var i=0;i<aLi.length;i++)
+        {
+            (function(i){
+                aLi[i].onclick = function(){
+                    alert(i);
+                }
+            })(i);
+        }
+    }
+</script>
+......
+<ul>
+    <li>111</li>
+    <li>222</li>
+    <li>333</li>
+    <li>444</li>
+    <li>555</li>
+</ul>
+
+```
+
+- 私有变量计数器，外部无法访问，避免全局变量的污染
+
+```
+<script type="text/javascript">
+
+var count = (function(){
+    var a = 0;
+    function add(){
+        a++;
+        return a;
+    }
+
+    return add;
+
+})()
+
+count();
+count();
+
+var nowcount = count();
+
+alert(nowcount);
+
+</script>
+```
+
+
+
+#### 4、内置对象
+
+（1）document
+
+```
+document.referrer  //获取上一个跳转页面的地址(需要服务器环境)
+```
+
+（2）location
+
+```
+window.location.href  //获取或者重定url地址
+window.location.search //获取地址参数部分
+window.location.hash //获取页面锚点或者叫哈希值
+```
+
+（3）Math
+
+```
+Math.random 获取0-1的随机数
+Math.floor 向下取整
+Math.ceil 向上取整
+```
+
+
+
+#### 5、面向对象
+
+（1）面向过程与面向对象编程
+
+1、面向过程：所有的工作都是现写现用。
+
+2、面向对象：是一种编程思想，许多功能事先已经编写好了，在使用时，只需要关注功能的运用，而不需要这个功能的具体实现过程。
+
+（2）javascript对象 
+将相关的变量和函数组合成一个整体，这个整体叫做对象，对象中的变量叫做属性，变量中的函数叫做方法。javascript中的对象类似字典。
+
+（3）创建对象的方法 
+
+- 单体
+
+```
+<script type="text/javascript">
+var Tom = {
+    name : 'tom',
+    age : 18,
+    showname : function(){
+        alert('我的名字叫'+this.name);    
+    },
+    showage : function(){
+        alert('我今年'+this.age+'岁');    
+    }
+}
+</script>
+
+```
+
+- 工厂模式
+
+```
+<script type="text/javascript">
+
+function Person(name,age,job){
+    var o = new Object();
+    o.name = name;
+    o.age = age;
+    o.job = job;
+    o.showname = function(){
+        alert('我的名字叫'+this.name);    
+    };
+    o.showage = function(){
+        alert('我今年'+this.age+'岁');    
+    };
+    o.showjob = function(){
+        alert('我的工作是'+this.job);    
+    };
+    return o;
+}
+var tom = Person('tom',18,'程序员');
+tom.showname();
+
+</script>
+
+```
+
+- 构造函数
+
+```
+<script type="text/javascript">
+    function Person(name,age,job){            
+        this.name = name;
+        this.age = age;
+        this.job = job;
+        this.showname = function(){
+            alert('我的名字叫'+this.name);    
+        };
+        this.showage = function(){
+            alert('我今年'+this.age+'岁');    
+        };
+        this.showjob = function(){
+            alert('我的工作是'+this.job);    
+        };
+    }
+    var tom = new Person('tom',18,'程序员');
+    var jack = new Person('jack',19,'销售');
+    alert(tom.showjob==jack.showjob);
+</script>
+
+```
+
+- 原型模式
+
+```
+<script type="text/javascript">
+    function Person(name,age,job){        
+        this.name = name;
+        this.age = age;
+        this.job = job;
+    }
+    Person.prototype.showname = function(){
+        alert('我的名字叫'+this.name);    
+    };
+    Person.prototype.showage = function(){
+        alert('我今年'+this.age+'岁');    
+    };
+    Person.prototype.showjob = function(){
+        alert('我的工作是'+this.job);    
+    };
+    var tom = new Person('tom',18,'程序员');
+    var jack = new Person('jack',19,'销售');
+    alert(tom.showjob==jack.showjob);
+</script>
+
+```
+
+- 继承
+
+```
+<script type="text/javascript">
+
+        function fclass(name,age){
+            this.name = name;
+            this.age = age;
+        }
+        fclass.prototype.showname = function(){
+            alert(this.name);
+        }
+        fclass.prototype.showage = function(){
+            alert(this.age);
+        }
+        function sclass(name,age,job)
+        {
+            fclass.call(this,name,age);
+            this.job = job;
+        }
+        sclass.prototype = new fclass();
+        sclass.prototype.showjob = function(){
+            alert(this.job);
+        }
+        var tom = new sclass('tom',19,'全栈工程师');
+        tom.showname();
+        tom.showage();
+        tom.showjob();
+    </script>
+```
+
