@@ -1,0 +1,25 @@
+.SUFFIXES:.c.o
+
+CC=gcc
+SERVERSRCS=tcp_server.c\
+			tcp_pub.c
+CLIENTSRCS=tcp_client.c\
+			tcp_pub.c
+			
+SERVEROBJS=$(SERVERSRCS:.c=.o)
+CLIENTOBJS=$(CLIENTSRCS:.c=.o)
+SERVEREXEC=Tcp_server_lin
+CLIENTEXEC=Tcp_client_lin
+
+all:$(SERVEROBJS) $(CLIENTOBJS)
+	$(CC)  -o $(CLIENTEXEC) $(CLIENTOBJS)
+	$(CC)  -o $(SERVEREXEC) $(SERVEROBJS)
+	@echo '----------OK-----------'
+
+.c.o:
+	$(CC) -Wall  -o $@ -c $<
+
+clean:
+	rm -f $(SERVEROBJS)
+	rm -f $(CLIENTOBJS)
+	rm -f core*
