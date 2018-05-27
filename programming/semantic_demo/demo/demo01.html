@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title></title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="http://upcdn.b0.upaiyun.com/libs/jquery/jquery-2.0.3.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="semantic/dist/semantic.css">
+    <script src="semantic/dist/semantic.js"></script>
+    <script src="./highcharts/exporting.js"></script>
+    <script src="./highcharts/highcharts-more.js"></script>
+    <script src="./highcharts/highcharts.js"></script>
+    <script src="./highcharts/jquery-1.8.3.min.js"></script>
+</head>
+
+<body>
+    <!-- header start -->
+    <div class="ui menu attached stackable" style="font-family: 微软雅黑">
+        <div class="ui container">
+            <div class="ui center aligned container">
+                <p style="margin-top: 10px">
+                    <i class="cloud icon "></i> 云监控 V1.0
+                </p>
+            </div>
+
+        </div>
+
+
+
+        <div class="ui simple left dropdown item">
+            用户操作
+            <i class="dropdown icon"></i>
+            <div class="ui right menu">
+                <a class="item" href="#">个人信息</a>
+                <div class="divider"></div>
+
+                <div class="item">
+                    <i class="dropdown icon"></i>
+                    <span class="text">自助服务</span>
+                    <div class="left menu">
+                        <a class="item" href="javascript:alert('建设中');">更改密码</a>
+                        <a class="item" href="javascript:alert('建设中');">管理授权</a>
+                    </div>
+
+
+                </div>
+                <div class="divider"></div>
+                <a href="javascript:alert('建设中');" class="header item">关于网页</a>
+            </div>
+
+
+        </div>
+        <a class="item">登出</a>
+
+
+    </div>
+    <!-- header end -->
+
+    <!-- content start-->
+    <div class="ui grid padded">
+        <div class="row ">
+            <!-- left start -->
+            <div class="three wide column ui vertical sticky menu fixed top ">
+
+                <div href="# " class="item ">
+
+                    <div href="# " class="header ">监控</div>
+                    <div href="# " class="menu ">
+                        <a href="# " class="item ">功能模块1</a>
+                    </div>
+
+                </div>
+
+
+                <div href="# " class="item ">
+
+                    <div href="# " class="header ">扩容</div>
+                    <div href="# " class="menu ">
+                        <a href="# " class="item ">功能模块1</a>
+                    </div>
+
+                </div>
+                <div href="# " class="item ">
+
+                    <div href="# " class="header ">发布</div>
+                    <div href="# " class="menu ">
+                        <a href="# " class="item ">功能模块1</a>
+                    </div>
+
+                </div>
+                <div href="# " class="item ">
+
+                    <div href="# " class="header ">变更</div>
+                    <div href="# " class="menu ">
+                        <a href="# " class="item ">功能模块1</a>
+                    </div>
+
+
+                </div>
+
+                <div href="# " class="item ">设置</div>
+                <div href="# " class="item ">关于</div>
+            </div>
+            <!-- left end -->
+
+            <!-- right start -->
+            <div class="thirteen wide column">
+                <div class="ui equal width grid divided " style="margin-top: 1px">
+                    <div class="row">
+                        <div class="column">
+                            <div class="ui segment red" id="charts1"></div>
+                        </div>
+                        <div class="column">
+                            <div class="ui segment blue" id="charts2"></div>
+                        </div>
+                    </div>
+                    <div class="ui divider"></div>
+                    <div class="row">
+                        <div class="column">
+                            <div class="ui segment blue" id="charts3"></div>
+                        </div>
+                        <div class="column">
+                            4
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+            <!-- right end -->
+
+        </div>
+    </div>
+    <!-- content end -->
+
+
+    <!-- footer start -->
+    <div class="ui vetical footer segment " style="background-color: tomato "></div>
+    <!-- footer end -->
+
+
+    <script>
+        $(function () {
+            $.getJSON('https://data.jianshukeji.com/jsonp?filename=json/usdeur.json&callback=?', function (data) {
+                $('#charts1').highcharts({
+                    chart: {
+                        zoomType: 'x'
+                    },
+                    title: {
+                        text: '美元兑欧元汇率走势图'
+                    },
+                    subtitle: {
+                        text: document.ontouchstart === undefined ?
+                            '鼠标拖动可以进行缩放' : '手势操作进行缩放'
+                    },
+                    xAxis: {
+                        type: 'datetime',
+                        dateTimeLabelFormats: {
+                            millisecond: '%H:%M:%S.%L',
+                            second: '%H:%M:%S',
+                            minute: '%H:%M',
+                            hour: '%H:%M',
+                            day: '%m-%d',
+                            week: '%m-%d',
+                            month: '%Y-%m',
+                            year: '%Y'
+                        }
+                    },
+                    tooltip: {
+                        dateTimeLabelFormats: {
+                            millisecond: '%H:%M:%S.%L',
+                            second: '%H:%M:%S',
+                            minute: '%H:%M',
+                            hour: '%H:%M',
+                            day: '%Y-%m-%d',
+                            week: '%m-%d',
+                            month: '%Y-%m',
+                            year: '%Y'
+                        }
+                    },
+                    yAxis: {
+                        title: {
+                            text: '汇率'
+                        }
+                    },
+                    legend: {
+                        enabled: false
+                    },
+                    plotOptions: {
+                        area: {
+                            fillColor: {
+                                linearGradient: {
+                                    x1: 0,
+                                    y1: 0,
+                                    x2: 0,
+                                    y2: 1
+                                },
+                                stops: [
+                                    [0, Highcharts.getOptions().colors[0]],
+                                    [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+                                ]
+                            },
+                            marker: {
+                                radius: 2
+                            },
+                            lineWidth: 1,
+                            states: {
+                                hover: {
+                                    lineWidth: 1
+                                }
+                            },
+                            threshold: null
+                        }
+                    },
+                    series: [{
+                        type: 'area',
+                        name: '美元兑欧元',
+                        data: data
+                    }]
+                });
+            });
+        });
+    </script>
+
+    <script>
+        $(function () {
+            $('#charts2').highcharts({
+                chart: {
+                    type: 'spline'
+                },
+                title: {
+                    text: '风速变化趋势图'
+                },
+                subtitle: {
+                    text: '2009年10月6日和7日两地风速情况'
+                },
+                xAxis: {
+                    type: 'datetime',
+                    labels: {
+                        overflow: 'justify'
+                    }
+                },
+                yAxis: {
+                    title: {
+                        text: '风 速 (m/s)'
+                    },
+                    min: 0,
+                    minorGridLineWidth: 0,
+                    gridLineWidth: 0,
+                    alternateGridColor: null,
+                    plotBands: [{ // Light air
+                        from: 0.3,
+                        to: 1.5,
+                        color: 'rgba(68, 170, 213, 0.1)',
+                        label: {
+                            text: '轻空气',
+                            style: {
+                                color: '#606060'
+                            }
+                        }
+                    }, { // Light breeze
+                        from: 1.5,
+                        to: 3.3,
+                        color: 'rgba(0, 0, 0, 0)',
+                        label: {
+                            text: '微风',
+                            style: {
+                                color: '#606060'
+                            }
+                        }
+                    }, { // Gentle breeze
+                        from: 3.3,
+                        to: 5.5,
+                        color: 'rgba(68, 170, 213, 0.1)',
+                        label: {
+                            text: '柔和风',
+                            style: {
+                                color: '#606060'
+                            }
+                        }
+                    }, { // Moderate breeze
+                        from: 5.5,
+                        to: 8,
+                        color: 'rgba(0, 0, 0, 0)',
+                        label: {
+                            text: '温和风',
+                            style: {
+                                color: '#606060'
+                            }
+                        }
+                    }, { // Fresh breeze
+                        from: 8,
+                        to: 11,
+                        color: 'rgba(68, 170, 213, 0.1)',
+                        label: {
+                            text: '清新风',
+                            style: {
+                                color: '#606060'
+                            }
+                        }
+                    }, { // Strong breeze
+                        from: 11,
+                        to: 14,
+                        color: 'rgba(0, 0, 0, 0)',
+                        label: {
+                            text: '强风',
+                            style: {
+                                color: '#606060'
+                            }
+                        }
+                    }, { // High wind
+                        from: 14,
+                        to: 15,
+                        color: 'rgba(68, 170, 213, 0.1)',
+                        label: {
+                            text: '狂风',
+                            style: {
+                                color: '#606060'
+                            }
+                        }
+                    }]
+                },
+                tooltip: {
+                    valueSuffix: ' m/s'
+                },
+                plotOptions: {
+                    spline: {
+                        lineWidth: 4,
+                        states: {
+                            hover: {
+                                lineWidth: 5
+                            }
+                        },
+                        marker: {
+                            enabled: false
+                        },
+                        pointInterval: 3600000, // one hour
+                        pointStart: Date.UTC(2009, 9, 6, 0, 0, 0)
+                    }
+                },
+                series: [{
+                    name: 'Hestavollane',
+                    data: [4.3, 5.1, 4.3, 5.2, 5.4, 4.7, 3.5, 4.1, 5.6, 7.4, 6.9, 7.1,
+                        7.9, 7.9, 7.5, 6.7, 7.7, 7.7, 7.4, 7.0, 7.1, 5.8, 5.9, 7.4,
+                        8.2, 8.5, 9.4, 8.1, 10.9, 10.4, 10.9, 12.4, 12.1, 9.5, 7.5,
+                        7.1, 7.5, 8.1, 6.8, 3.4, 2.1, 1.9, 2.8, 2.9, 1.3, 4.4, 4.2,
+                        3.0, 3.0]
+                }, {
+                    name: 'Voll',
+                    data: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.1, 0.0, 0.3, 0.0,
+                        0.0, 0.4, 0.0, 0.1, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                        0.0, 0.6, 1.2, 1.7, 0.7, 2.9, 4.1, 2.6, 3.7, 3.9, 1.7, 2.3,
+                        3.0, 3.3, 4.8, 5.0, 4.8, 5.0, 3.2, 2.0, 0.9, 0.4, 0.3, 0.5, 0.4]
+                }],
+                navigation: {
+                    menuItemStyle: {
+                        fontSize: '10px'
+                    }
+                }
+            });
+        });
+    </script>
+
+    <script>
+        $(function () {
+            $('#charts3').highcharts({
+                chart: {
+                    type: 'area'
+                },
+                title: {
+                    text: '全球各大洲人口占比'
+                },
+                subtitle: {
+                    text: '数据来源: Wikipedia.org'
+                },
+                xAxis: {
+                    categories: ['1750', '1800', '1850', '1900', '1950', '1999', '2050'],
+                    tickmarkPlacement: 'on',
+                    title: {
+                        enabled: false
+                    }
+                },
+                yAxis: {
+                    title: {
+                        text: '百分比'
+                    }
+                },
+                tooltip: {
+                    pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.percentage:.1f}%</b> ({point.y:,.0f} 百万)<br/>',
+                    shared: true
+                },
+                plotOptions: {
+                    area: {
+                        stacking: 'percent',
+                        lineColor: '#ffffff',
+                        lineWidth: 1,
+                        marker: {
+                            lineWidth: 1,
+                            lineColor: '#ffffff'
+                        }
+                    }
+                },
+                series: [{
+                    name: '亚洲',
+                    data: [502, 635, 809, 947, 1402, 3634, 5268]
+                }, {
+                    name: '非洲',
+                    data: [106, 107, 111, 133, 221, 767, 1766]
+                }, {
+                    name: '欧洲',
+                    data: [163, 203, 276, 408, 547, 729, 628]
+                }, {
+                    name: '美洲',
+                    data: [18, 31, 54, 156, 339, 818, 1201]
+                }, {
+                    name: '大洋洲',
+                    data: [2, 2, 2, 6, 13, 30, 46]
+                }]
+            });
+        });
+    </script>
+</body>
+
+
+</html>

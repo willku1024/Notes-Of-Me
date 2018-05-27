@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title></title>
+    <meta charset="UTF-8">
+    <!-- <link rel="stylesheet" type="text/css" href="semantic/dist/semantic.css"> -->
+    <!-- <link href="https://cdn.bootcss.com/semantic-ui/2.2.13/semantic.min.css" rel="stylesheet"> -->
+
+    <!-- <link href="http://ox6yf62u0.bkt.clouddn.com/semantic-ui/2.2.13/semantic.min.css" rel="stylesheet">
+    <script src="http://ox6yf62u0.bkt.clouddn.com/jquery-2.1.4.min.js"></script>
+    <script src="http://ox6yf62u0.bkt.clouddn.com/semantic-ui/2.2.13/semantic.min.js"></script> -->
+
+    <link rel="stylesheet" type="text/css" href="semantic/dist/semantic.min.css">
+    <script src="semantic/dist/jquery-2.0.3.min.js"></script>
+    <script src="semantic/dist/semantic.min.js"></script>
+
+    <style>
+        #tip_grid {
+            height: 100%;
+            /* top:30%;
+            position: fixed;
+            z-index: 999; */
+        }
+
+        #tip_column {
+            margin-top: 30px;
+            max-width: 230px;
+
+        }
+
+        #essay {
+            font-family: dashicons, "Segoe UI", "WenQuanYi Micro Hei", "WenQuanYi Micro Hei Mono", "Microsoft Yahei", "Microsoft Yahei Mono", 微软雅黑, sans-serif;
+        }
+
+    </style>
+    
+    <script>
+        $('document').ready(function () {
+
+            $('img').addClass("ui centered medium image")
+
+
+        });
+
+
+    </script>
+</head>
+
+<body class="ui blurring">
+
+    <div class=" ui aligned container three column centered grid" style="margin-top:10px">
+        <div class="row">
+            <div class="left aligned column">
+                <div class="ui vertical animated button basic" tabindex="0">
+                    <div class="hidden content" style="font-weight: bold">上一篇</div>
+                    <div class="visible content">
+                        <i class="arrow large left teal icon"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="center aligned column">
+                <div class="ui  fade animated button basic" tabindex="0">
+                    <div class="visible content">
+                        <i class="home large teal icon"></i>
+                    </div>
+                    <div class="hidden content" style="font-weight: bold" onclick="$('.ui.dimmable')
+                    .dimmer('hide')
+                  ;">
+                        主页
+                    </div>
+                </div>
+            </div>
+            <div class="right aligned column">
+                <div class="ui vertical animated button basic" tabindex="0">
+                    <div class="hidden content " style="font-weight: bold">下一篇</div>
+                    <div class="visible content">
+                        <i class="arrow  large right teal icon"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <p></p>
+    </div>
+
+
+
+
+    <div class="ui   text container" blog_id="3">
+
+        <div class="ui  segment">
+
+            <h2 class="ui header teal">荷塘月色</h2>
+            <div class="ui grid two column  stackable">
+                <div class="right aligned column">
+                    发布者:Tommy
+                </div>
+                <div class="right aligned column">
+                    发表时间： 2017年9月17日&nbsp;星期日
+                </div>
+            </div>
+
+
+            <div class="ui section divider "></div>
+            <div id="essay">
+                <p>　　曲曲折折的荷塘上面，弥望的是田田的叶子。叶子出水很高，像亭亭的舞女的裙。层层的叶子中间，零星地点缀着些白花，有袅娜地开着的，有羞涩地打着朵儿的；正如一粒粒的明珠，又如碧天里的星星，又如刚出浴的美人。微风过处，送来缕缕清香，仿佛远处高楼上渺茫的歌声似的。这时候叶子与花也有一丝的颤动，像闪电般，霎时传过荷塘的那边去了。叶子本是肩并肩密密地挨着，这便宛然有了一道凝碧的波痕。叶子底下是脉脉的流水，遮住了，不能见一些颜色；而叶子却更见风致了。
+                </p>
+                <img src="images/p1.jpg" srcset="">
+                <p>　　月光如流水一般，静静地泻在这一片叶子和花上。薄薄的青雾浮起在荷塘里。叶子和花仿佛在牛乳中洗过一样；又像笼着轻纱的梦。虽然是满月，天上却有一层淡淡的云，所以不能朗照；但我以为这恰是到了好处——酣眠固不可少，小睡也别有风味的。月光是隔了树照过来的，高处丛生的灌木，落下参差的斑驳的黑影，峭楞楞如鬼一般；弯弯的杨柳的稀疏的倩影，却又像是画在荷叶上。塘中的月色并不均匀；但光与影有着和谐的旋律，如梵婀玲上奏着的名曲。</p>
+                <p> 　　荷塘的四面，远远近近，高高低低都是树，而杨柳最多。这些树将一片荷塘重重围住；只在小路一旁，漏着几段空隙，像是特为月光留下的。树色一例是阴阴的，乍看像一团烟雾；但杨柳的丰姿，便在烟雾里也辨得出。树梢上隐隐约约的是一带远山，只有些大意罢了。树缝里也漏着一两点路灯光，没精打采的，是渴睡人的眼。这时候最热闹的，要数树上的蝉声与水里的蛙声；但热闹是它们的，我什么也没有。
+
+                </p>
+
+            </div>
+            <div class="ui section divider"></div>
+
+            <div class="ui labeled button" tabindex="0">
+                <div class="ui teal button">
+                    <i class="heart icon"></i> 喜欢 </div>
+                <a class="ui basic teal left pointing label">
+                    1,048
+                </a>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+    <div class="ui raised  text container segment  basic" id="abc">
+
+        <div class="ui comments" id="element-to-follow">
+            <h3 class="ui dividing teal header">近期评论</h3>
+            <div class="comment">
+                <!-- <a class="avatar">
+                    <img src="/images/avatar/small/matt.jpg">
+                </a> -->
+                <div class="content">
+                    <a class="author">Matt</a>
+                    <div class="metadata">
+                        <span class="date">今天下午 5:42</span>
+                    </div>
+                    <div class="text">太赞了！ </div>
+                    <div class="actions">
+                        <a class="reply">回复</a>
+                    </div>
+                </div>
+            </div>
+            <div class="comment">
+                <!-- <a class="avatar">
+                    <img src="/images/avatar/small/joe.jpg">
+                </a> -->
+                <div class="content">
+                    <a class="author">Joe Henderson</a>
+                    <div class="metadata">
+                        <span class="date">5 天以前</span>
+                    </div>
+                    <div class="text">老兄，这太棒了。非常感谢。 </div>
+                    <div class="actions">
+                        <a class="reply">回复</a>
+                    </div>
+                </div>
+            </div>
+            <form class="ui reply form">
+                <div class="field">
+                    <textarea></textarea>
+                </div>
+                <div class="ui teal labeled submit icon button">
+                    <i class="icon edit"></i> 发表 </div>
+            </form>
+        </div>
+
+
+        <div class="ui right rail " style="position:relative">
+
+            <div class="ui segment basic right aligned " style="position: absolut;bottom: 30px" id="returnTop">
+                <button class="ui icon button inverted white">
+                    <i class="chevron circle up icon big teal ui">
+                        <span style="font-size: 18px;font-weight: bold">Top</span>
+                    </i>
+                </button>
+
+            </div>
+
+
+
+        </div>
+
+    </div>
+
+    <div class="ui dimmer">
+        <div class=" ui middle aligned center aligned grid padded " id="tip_grid">
+            <div class="column" id="tip_column">
+                <div class="ui icon floating message">
+                    <i class="comment outline  icon"></i>
+                    <div class="header">
+                        <p>评论成功</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+    <div class="ui button" onclick="haha()" style="background-color: red">
+    </div>
+
+    <script>
+        function haha() {
+            $('body').dimmer('show');
+            setTimeout(
+                function () {
+
+                    window.location.reload()
+                }
+                , 1000)
+
+        }
+
+
+    </script>
+    <script>
+            $("#returnTop").click(function () {
+                var speed = 250;
+                $('body,html').animate({ scrollTop: 0 }, speed);
+                return false;
+            });
+    </script>
+    <script>
+            $(".submit.button").click(function () {
+                var blog_id = $('.text.container').attr('blog_id');
+
+
+                alert(comments);
+                // $.ajax({
+                //     cache: false,
+                //     type: "POST",
+                //     url: "{% url 'add_comment' %}",
+                //     data: { 'blog_id': blog_id },
+                //     async: true,
+                //     beforeSend: function (xhr, settings) {
+                //         xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                //     },
+                //     success: function (data) {
+                //         if (data.status == 'success') {
+                //             alert('success');
+                //         } else {
+                //             alert('failed');
+                //         }
+                //     },
+                // });
+            });
+    </script>
+</body>
+
+</html>
