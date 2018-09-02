@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <!-- <link href="https://cdn.bootcss.com/minireset.css/0.0.2/minireset.min.css" rel="stylesheet"> -->
+    <title>导航条03-float</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar {
+            background-color: #55a8ea;
+            width: 700px;
+            height: 40px;
+            margin: 100px auto 0;
+        }
+
+        .navbar ul {
+            height: 40px;
+        }
+
+        .navbar ul li {
+            list-style-type: none;
+            float: left;
+            width: 100px;
+            height: inherit;
+            text-align: center;
+            line-height: 40px;
+        }
+
+        .navbar ul li a {
+            text-decoration: none;
+        }
+
+
+        .navbar ul li:hover {
+            background-color: turquoise;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="navbar">
+        <ul>
+            <li>
+                <a href="">首页</a>
+            </li>
+            <li>
+                <a href="">网站建设</a>
+            </li>
+            <li >
+                <a href="">程序开发</a>
+            </li>
+            <li>
+                <a href="">网络营销</a>
+            </li>
+            <li>
+                <a href="">企业VI</a>
+            </li>
+            <li>
+                <a href="">案例展示</a>
+            </li>
+            <li>
+                <a href="">联系我们</a>
+            </li>
+        </ul>
+
+    </div>
+</body>
+
+</html>

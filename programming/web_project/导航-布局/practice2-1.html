@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <!-- <link href="https://cdn.bootcss.com/minireset.css/0.0.2/minireset.min.css" rel="stylesheet"> -->
+    <title>导航条04-inline</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        .box1 {
+            /* border: 1px solid gold;
+            box-sizing: border-box; */
+            width: 602px;
+            height: 292px;
+            margin: 50px auto;
+            background-color: gold;
+            /* overflow: hidden; */
+        }
+
+        .box2 {
+            border: 1px solid gray;
+            width: 100px;
+            height: 50px;
+            margin: 121px auto;
+            background-color: turquoise;
+        }
+
+
+        .clearfix:before,.clearfix:after{
+            display: table;
+            content: '';
+        }
+        .clearfix:after{
+            clear: both;
+        }
+        .clearfix{
+            zoom: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="box1 clearfix">
+        <div class="box2">
+        </div>
+    </div>
+</body>
+
+</html>
