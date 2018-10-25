@@ -1,0 +1,102 @@
+MBR： 主引导记录（512字节）
+Master Boot Record
+446	bytes: BootLoader， 一段程序
+64	bytes: 每16bytes标识一个分区 ，所以: 主+扩展<=4
+2	bytes: 标记MBR是否有效
+
+md: 
+mdadm: 将任何块设备做成RAID
+模式化的命令：
+	创建模式
+		-C 
+			专用选项：
+				-l: 级别
+				-n #: 设备个数
+				-a {yes|no}: 是否自动为其创建设备文件
+				-c: CHUNK大小, 2^n，默认为64K
+				-x #: 指定空闲盘个数
+	管理模式
+		--add, --remove, --fail, --detail, --stop
+		mdadm /dev/md# --fail /dev/sda7
+	监控模式
+		-F
+	增长模式
+		-G
+	装配模式
+		-A
+
+查看RAID阵列的详细信息
+mdadm -D /dev/md#
+	--detail
+	
+停止阵列：
+	mdadm -S /dev/md#
+		--stop
+
+创建一个空间大小为10G的RAID5设备；其chuck大小为32k；要求此设备开机时可以自动挂载至/backup目录；
+
+RAID0
+	2G:
+		4: 512MB
+		2: 1G
+
+RAID1
+	2G
+		2：2G
+		
+example:
+root# mdadm -C /dev/md1 -a yes -n 2 -l 1 /dev/sda7 /dev/sda8
+root# cat /proc/mdstat (查看RAID的同步信息)
+root# mke2fs -j /dev/md1
+root# mdadm -D[--detail] /dev/md1 (显示该RAID设备的详细信息)
+
+root# mdadm /dev/md1 --fail /dev/sda8 (模拟该设备损坏)
+root# mdadm /dev/md1 --remove /dev/sda8 (移除损坏的的设备)
+root# mdadm /dev/md1 --add /dev/sda9  (sda9和损坏sda8必须大小一致)
+
+root# mdadm -S /dev/md1 (取消RAID)
+root# rm /dev/md1   (移除设备文件)
+root# mdadm -A /dev/md1 (重新装回来RAID)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

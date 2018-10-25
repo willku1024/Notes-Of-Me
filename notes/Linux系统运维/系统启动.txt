@@ -1,0 +1,306 @@
+POST-->BIOS-->MBR（bootloader[446]+[64]+[2]）->Kernel-->initrd（ramdisk技术、转移/proc、/sys、/dev到真实的根目录）-->（ROOTFS）/sbin/init（按照/etc/inittab中定义的启动级别工作）
+
+
+内核的设计风格：
+	单内核：所有功能全部集成，容易发成连带崩溃。工作逻辑简单
+	微内核：把功能拆分为模块，设计复杂
+
+单内核：Linux
+		核心：ko（kernel object），动态加载内核模块
+		内核：/lib/modules/内核版本号命名的目录
+微内核：Windows，Solaris
+
+RedHat5：ramdisk-->initrd
+RedHat6：ramfs-->initramfs
+
+
+chroot：chroot /path/to/temproot [COMMAND...]
+		chroot /test/virroot /bin/bash
+
+ldd:查看二进制文件依赖的共享库
+
+
+启动的服务不同：
+	运行级别：0-6
+	0：halt
+	1：single user mode，直接以管理员身份切入
+	2：multi user mode， no NFS
+	3：multi user mode， text mode
+	4：保留
+	5：multi user mode， graphic mode
+	6：reboot
+
+详解操作系统：
+bootloader(位于MBR)
+	LILO：LInux LOader，不支持大硬盘。对嵌入式支持好
+	GRUB：GRand Unified Boorloader
+		Stage1:MBR
+		Stage1_5:识别不同的文件系统
+		Stage2:/boot/grub
+
+grub-md5-crypt
+
+
+查看运行级别的命令：
+runlevel：5 3 ，表示由前一个级别切换到后一个级别
+who -r
+
+查看内核release号：
+	uname -r
+	uname -a
+
+修复grub的几种方法：
+方式一：安装grub stage1，损坏未重启的情况
+# grub
+grub> root (hd1,0)  # 表示hd1上的第一个主分区,需要尝试
+grub> setup (hd1)
+grub> quit
+
+方式二：完全重新安装grub
+比如发现以下关系：mount /dev/hda2 /mnt/boot
+# grub-install --root-directory=/mnt /dev/hda #需要指定boot 的父路径
+# vim /mnt/boot/grub/grub.conf
+default=0
+timeout=5
+title Fake Linux
+	root (hd0,0)
+	kernel /vmlinuz
+	initrd /initrd.img
+
+修复grub.conf损坏，开机停在stage2阶段无法启动，在grub界面下操作
+grub> find (hd#,N)/  # 此时按Tab键
+grub> root (hd#,N)
+grub> kernel /vmlinuz-2.6.18
+grub> initrd /initrd-2.6.18
+grub> boot
+
+
+Kernel 初始化的过程：
+1、设备探测
+2、驱动初始化（可能会从initrd[initramfs]中加载驱动模块）
+3、以只读的挂载根文件系统
+4、装载第一个进程init（PID:1）
+
+
+/sbin/init：读取/etc/inittab
+	upstart：ubuntu
+	systemd: 并行启动 
+ 
+/etc/inittab配置文件的规则：
+	id：runlevel：action：process
+	action:
+			initdefault:设定默认的运行级别
+			sysinit：系统初始化
+			wait:等待级别切换至此级别时执行
+			respawn：一旦程序终止，会重新启动
+
+/etc/inittab配置文件的任务：
+1、设定默认的运行级别
+2、运行系统初始化脚本
+3、运行指定运行级别对应的目录下的脚本
+4、设定Ctrl+Alt+Del组合键的操作
+5、启动虚拟终端（2345级别）
+6、启动图形终端（5级别）
+
+/etc/rc.d/rc.sysinit完成的任务：
+1、激活udev何selinux
+2、根据/etc/sysctl.conf文件，来设定内核参数
+3、设定时钟
+4、装载键盘映射
+5、启用交换分区
+6、设置主机名
+7、根文件系统检测，并以读写方式重新挂载
+8、激活RAID何LVM设备
+9、启用磁盘配额
+10、根据/etc/fstab，挂载其他文件系统
+11、清理过期的锁和PID文件
+
+
+服务类脚本：
+	SysV风格： /etc/rc.d/init.d
+		start|stop|restart|status
+		reload|configtest
+
+chkconfig:runlevels 	SS 	 	KK
+		  当chkconfig命令龙为此脚本在rc#.d目录创建链接时，runlevels表示默认创建为S*开头的链接，除此之外的级别创建为K*开头的链接；
+		  S*后面的启动优先级为SS给表示的值、K*后面的关闭次序为KK表示的数字；
+		  注意：runlevels为'-'，表示没有S*开头的链接
+description:用于说明此脚本的简单功能，'\'为续行符号
+
+#!/bin/bash
+
+# chkconfig 2345 77 22
+# description: Test Services
+
+status(){
+	if [ -e $LOCKFILE ]; then
+		echo "Running..."
+	else
+		echo "Stopped."
+	fi
+
+}
+
+usage() {
+	echo "`basename $0` {start|stop|restart|status}"
+}
+
+LOCKFILE=/var/lock/subsys/myservice
+case $1 in 
+start)
+	echo "Staring..."
+	touch $LOCKFILE
+	;;
+stop)
+	echo "Stop..."
+	rm -f $LOCKFILE &> /dev/null
+	;;
+restart)
+	echo "Restart..."
+	;;
+status)
+	status
+	;;
+*)
+	usage
+	;;
+esac
+
+chkconfig命令的使用：
+chkconfig --list:查看所有独立守护服务的启动设定：
+chkconfig --list [SERVICE_NAME]：查看单个服务
+
+chkconifg --add [SERVICE_NAME]:为rc#.d添加服务脚本的链接
+chkconifg --del [SERVICE_NAME]
+chkconifg --level [RUNLEVEL] [SERVICE_NAME] {on|off}:调整服务的运行级别,chkconifg --level 24 myservice on
+chkconifg [--level RUNLEVEL] [SERVICE_NAME] {on|off}:省略运行级别，则默认为2345
+
+守护进程的类型：
+	独立守护进程
+	瞬时守护进程（不需要关联至运行级别）：由xinetd超级守护进程管理
+
+核心：/boot/vmlinuxz-version
+内核模块（ko）:/lib/modules/version
+
+内核设计：
+	单内核：模块化设计
+	微内核
+
+装载模块：
+	insmod
+	modeprobe
+
+用户空间访问、监控内核的方式：
+/proc、/sys
+
+伪文件系统
+
+/proc/sys：此目录的文件很多是可以读写的
+/sys：某些文件可写
+
+设定内核参数值的方法：
+能立即生效，但是重启无效
+（1）echo VALUE > /proc/sys/TO/SOMEFILE
+（2）sysctl -w kernel.hostname="a.example.com"
+(e.g) sysctl -w vm.drop_caches=1 或者 echo VALUE > /proc/sys/vm/drop_caches
+
+永久有效,但是不能立即生效的方法：vim /etc/sysctl.conf 之后再sysctl -p 使其立即生效
+sysctl -a 显示所有的内核参数 
+
+常见内核参数:
+/proc/sys/vm/drop_caches
+/proc/sys/kernel/hostname
+/proc/sys/nwe/ipv4/ip_forward
+
+内核模块管理：
+（1）lsmod：查看内核装载了哪些模块
+（2）modprobe:管理模块
+	 modprobe MOD_NAME：装载模块
+     modprobe -r MOD_NAME：卸载模块
+（3）modinfo：重看模块的具体内容信息
+（4）insmod /PATH/TO/MODULE_FILE：装载模块
+（5）rmmod MOD_NAME：移除模块
+（6）depmod /PATH/TO/MODULES_DIR:生成依赖的模块信息
+
+内核中的功能除核心的功能之外，在编译时，大多数功能都有三种选择：
+1、不使用此功能
+2、编译成内核模块
+3、编译进内核之中
+
+
+如何手动编译内核：
+make gconfig：Gnome桌面环境使用，需要安装图形开发库组：Gnome Software Development
+make kconifg：KDE桌面环境使用，需要安装图形开发库
+
+
+make menuconfig
+make
+make modules_install
+make install
+
+二次编译时清理，清理前，如果有需要的话备份配置文件.config:
+	make clean
+	make mrproper
+
+	
+screen命令：
+	screen -ls：显示已经建立的屏幕
+	screen：直接打开一个新的屏幕
+	screen -r ID：还原回某个屏幕
+	Ctrl+a，d：拆掉某个屏幕
+	敲击exit：关闭某个屏幕连接
+
+制作迷你Linux系统
+	grub->kernel->initrd->ROOTFS(/sbin/init,/bin/bash)
+
+~$ fdisk -l
+~$ fdisk /dev/sdb 
+~$ partprobe /dev/sdb
+~$ df -h
+~$ mkfs.ext3 /dev/sdb1
+~$ mkfs.~$ext3 /dev/sdb2
+~$ mkdir /mnt/{boot,sysroot}
+~$ mount /dev/sdb1 /mnt/boot/
+~$ mount /dev/sdb2 /mnt/sysroot/
+~$ grub-install --root-directory=/mnt/ /dev/sdb （指定搜索boot目录的路径作为root-directory）
+~$ cp /boot/vmlinuz-2.6.32-696.el6.x86_64 /mnt/boot/vmlinuz （拷贝内核文件至boot目录中）
+~$ mkinitrd /boot/initrd-`uname -r`.img `uname -r`（mkinitrd initrd文件路径 内核版本号）
+~$ mkdir iso && cd iso && zcat /boot/initrd-2.6.32-696.el6.x86_64.img |cpio -id
+iso$ find . |  cpio -H newc --quiet -o|gzip -9 > /mnt/boot/initrd.gz
+~$ vim /mnt/sysinit/etc/inittab
+	id:3:initdefault:
+	si::sysinit:/etc/rc.d/rc.sysinit
+~$ vim /mnt/sysinit/etc/rc.d/rc.sysinit
+	#!/bin/bash
+	#
+	echo -e "\tWelcome to \033[31mMini-Linux\033[0m"
+	/bin/bash
+
+
+
+${#parameter}
+          Parameter  length. 
+[root@VM_89_59_centos ~]# echo ${#file}
+4
+
+${parameter#word}
+${parameter##word}
+      Remove  matching  prefix pattern.  
+
+bash截取字符串（从左向右）
+$ file=abc@abcsdf
+$ echo ${file#*abc}
+@abcsdf
+$ echo ${file##*abc}
+sdf
+
+${parameter%word}
+${parameter%%word}
+      Remove matching suffix pattern.  Th
+
+bash截取字符串（从右向左）
+$ file=abc@abcsdf
+$ echo ${file%abc*}
+$ echo ${file%%abc*}
+
+

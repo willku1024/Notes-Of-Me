@@ -1,0 +1,27 @@
+CI:持续集成（Continuous integration）
+CD:持续交付（Continuous delivery）
+CD:持续部署 (Continuous deployment)
+
+master/node模型
+	master： API server，Scheduler，Controller-Manager
+	node：kubelet（API client），docker，kube-proxy
+
+
+
+Pod概念：
+	自主式pod：无法自由的调度
+	控制器管理的pod：
+		ReplicationController
+		ReplicateSet：不直接使用
+		DeploymetSet：无状态应用的控制器，支持2级控制器HPA控制器
+		StatefulSet：有状态应用的控制器
+		DaemonSet：不是随意运行，每个node一个的控制器
+		Job/Cronjob：周期性的
+
+
+通信：
+结点网络->集群网络(service)->pod网络
+
+同一个pod内的多个容器间：lo
+各pod之间的通信：overlay network，叠加网络
+Pod与Service之间的通信：kube-proxy
