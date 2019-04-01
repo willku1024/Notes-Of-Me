@@ -1,4 +1,4 @@
-/*tcp:server¶Ë*/
+/*tcp:serverç«¯*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -11,126 +11,126 @@
 #include <pthread.h>
 #include <signal.h>
 
+
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
 int status = 1;
-struct ps{
+struct ps
+{
 	int st;
 	pthread_t *thr;
 };
 
 void getCurTime(char timeCur[])
 {
-    time_t  Time;
-    struct tm* Tm = NULL;
+	
+	time_t Time;
+	struct tm *Tm = NULL;
 
-    time(&Time);
-    Tm = localtime(&Time);
-    strftime(timeCur,20,"%Y/%m/%d %H:%M:%S",Tm);
-
+	time(&Time);
+	Tm = localtime(&Time);
+	strftime(timeCur, 20, "%Y/%m/%d %H:%M:%S", Tm);
 }
 
 void catch_Signal(int Sign)
 {
-	switch(Sign)
+	switch (Sign)
 	{
-		case SIGINT:
-			printf("\nSYS  MSG:SERVER SHUTDOWN \n");
-			exit(EXIT_SUCCESS);
+	case SIGINT:
+		printf("\nSYS  MSG:SERVER SHUTDOWN \n");
+		exit(EXIT_SUCCESS);
 	}
 }
 
-int signal1(int signo,void (*func)(int))
+int setsignal(int signo, void (*func)(int))
 {
-	struct sigaction act,oact;
-	act.sa_handler = func;//»Øµ÷º¯Êı³õÊ¼»¯
-	sigemptyset(&act.sa_mask);//³õÊ¼»¯
+	struct sigaction act, oact;
+	act.sa_handler = func;	 //å›è°ƒå‡½æ•°åˆå§‹åŒ–
+	sigemptyset(&act.sa_mask); //åˆå§‹åŒ–
 	act.sa_flags = 0;
-	return sigaction(signo,&act,&oact);
-	
+	return sigaction(signo, &act, &oact);
 }
 
-void *recvsocket(void *arg)//½ÓÊÕclient¶ËsocketÊı¾İµÄÏß³Ì
+void *recvsocket(void *arg) //æ¥æ”¶clientç«¯socketæ•°æ®çš„çº¿ç¨‹
 {
 	struct ps *p = (struct ps *)arg;
 	int st = p->st;
 	char s[1024];
-	
-	while(1)
+
+	while (1)
 	{
 		memset(s, 0, sizeof(s));
 		int rc = recv(st, s, sizeof(s), 0);
-		if (rc <= 0)//Èç¹ûrecv·µ»ØĞ¡ÓÚµÈÓÚ0£¬´ú±ísocketÒÑ¾­¹Ø±Õ»òÕß³ö´íÁË
-        {
-			if(rc == 0)
+		if (rc <= 0) //å¦‚æœrecvè¿”å›å°äºç­‰äº0ï¼Œä»£è¡¨socketå·²ç»å…³é—­æˆ–è€…å‡ºé”™äº†
+		{
+			if (rc == 0)
 			{
-				 printf("SYS  MSG:Client Quit.\n");
-				if(status != 1)
+				printf("SYS  MSG:Client Quit.\n");
+				if (status != 1)
 				{
 					pthread_mutex_lock(&mutex);
-					status-- ;printf("SYS  MSG:Online User: %d\n",status);
-					pthread_mutex_unlock(&mutex);	
+					status--;
+					printf("SYS  MSG:Online User: %d\n", status);
+					pthread_mutex_unlock(&mutex);
 				}
 			}
-	
-            break;
-        }
-        
+
+			break;
+		}
+
 		struct sockaddr_in client_addr;
 		char time[20];
 		memset(time, 0, sizeof(time));
-		memset(&client_addr,0,sizeof(client_addr));
+		memset(&client_addr, 0, sizeof(client_addr));
 		socklen_t len = sizeof(client_addr);
-		getpeername(st, (struct sockaddr *) &client_addr, &len);
+		getpeername(st, (struct sockaddr *)&client_addr, &len);
 		getCurTime(time);
-		
-		//´òÓ¡client´«ËÍÀ´µÄÄÚÈİ
-		if(s[0] != 0x0d && s[0] != 0x20 && s[0] != 0x0a)
-			printf("\n%s User--%s:\n%s",time, inet_ntoa(client_addr.sin_addr),s);
 
+		//æ‰“å°clientä¼ é€æ¥çš„å†…å®¹
+		if (s[0] != 0x0d && s[0] != 0x20 && s[0] != 0x0a)
+			printf("\n%s User--%s:\n%s", time, inet_ntoa(client_addr.sin_addr), s);
 	}
 
-	pthread_cancel(*(p->thr));//±»cancelµôµÄÏß³ÌÄÚ²¿Ã»ÓĞÊ¹ÓÃËø¡£
+	pthread_cancel(*(p->thr)); //è¢«cancelæ‰çš„çº¿ç¨‹å†…éƒ¨æ²¡æœ‰ä½¿ç”¨é”ã€‚
 	return NULL;
 }
 
-void *sendsocket(void *arg)//Ïòclient¶Ësocket·¢ËÍÊı¾İµÄÏß³Ì
+void *sendsocket(void *arg) //å‘clientç«¯socketå‘é€æ•°æ®çš„çº¿ç¨‹
 {
 	int st = *(int *)arg;
 	char s[1024];
 
-	while(1)
+	while (1)
 	{
 		memset(s, 0, sizeof(s));
-		read(STDIN_FILENO, s, sizeof(s));//´Ó¼üÅÌ¶ÁÈ¡ÓÃ»§ÊäÈëĞÅÏ¢
+		read(STDIN_FILENO, s, sizeof(s)); //ä»é”®ç›˜è¯»å–ç”¨æˆ·è¾“å…¥ä¿¡æ¯
 		send(st, s, strlen(s), 0);
 	}
 	return NULL;
 }
 
-
 void authorInfo()
 {
-    puts("============================================");
-    puts("Name        : ICQ in Linux");
-    puts("Version     : Beta v1.0 ");
-    puts("Copyright   : Power by x_jwei");
-    puts("Description : Multithread && Socket programming in C");
-    puts("============================================");
+	puts("============================================");
+	puts("Name        : ICQ in Linux");
+	puts("Version     : Beta v1.0 ");
+	puts("Copyright   : Power by x_jwei");
+	puts("Description : Multithread && Socket programming in C");
+	puts("============================================");
 }
 
 int main(int arg, char *args[])
 {
 	if (arg < 2)
 	{
-		printf("Usage: %s  <port>\n",args[0]);
+		printf("Usage: %s  <port>\n", args[0]);
 		return -1;
 	}
-    authorInfo();
+	authorInfo();
 	int port = atoi(args[1]);
-	int st = socket(AF_INET, SOCK_STREAM, 0);//³õÊ¼»¯socket
+	int st = socket(AF_INET, SOCK_STREAM, 0); //åˆå§‹åŒ–socket
 
-    //¸øTCPÉèÖÃµØÖ·¿ÉÖØÓÃ
+	//ç»™TCPè®¾ç½®åœ°å€å¯é‡ç”¨
 	int on = 1;
 	if (setsockopt(st, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on)) == -1)
 	{
@@ -138,51 +138,52 @@ int main(int arg, char *args[])
 		return EXIT_FAILURE;
 	}
 
-
-	struct sockaddr_in addr;//¶¨ÒåÒ»¸öIPµØÖ·½á¹¹
+	struct sockaddr_in addr; //å®šä¹‰ä¸€ä¸ªIPåœ°å€ç»“æ„
 	memset(&addr, 0, sizeof(addr));
-	addr.sin_family = AF_INET;//½«addr½á¹¹µÄÊôĞÔ¶¨Î»ÎªTCP/IPµØÖ·
-	addr.sin_port = htons(port);//½«±¾µØ×Ö½ÚË³Ğò×ª»¯ÎªÍøÂç×Ö½ÚË³Ğò¡£
-	addr.sin_addr.s_addr = htonl(INADDR_ANY);//INADDR_ANY´ú±íÕâ¸öserverÉÏËùÓĞµÄµØÖ·
+	addr.sin_family = AF_INET;				  //å°†addrç»“æ„çš„å±æ€§å®šä½ä¸ºTCP/IPåœ°å€
+	addr.sin_port = htons(port);			  //å°†æœ¬åœ°å­—èŠ‚é¡ºåºè½¬åŒ–ä¸ºç½‘ç»œå­—èŠ‚é¡ºåºã€‚
+	addr.sin_addr.s_addr = htonl(INADDR_ANY); //INADDR_ANYä»£è¡¨è¿™ä¸ªserverä¸Šæ‰€æœ‰çš„åœ°å€
 
-	//½«IPÓëserver³ÌĞò°ó¶¨
-	if (bind(st, (struct sockaddr *) &addr, sizeof(addr)) == -1)
+	//å°†IPä¸serverç¨‹åºç»‘å®š
+	if (bind(st, (struct sockaddr *)&addr, sizeof(addr)) == -1)
 	{
 		printf("bind failed %s\n", strerror(errno));
 		return EXIT_FAILURE;
 	}
 
-	//server¶Ë¿ªÊ¼listen£¬
+	//serverç«¯å¼€å§‹listenï¼Œ
 	if (listen(st, 20) == -1)
 	{
 		printf("listen failed %s\n", strerror(errno));
 		return EXIT_FAILURE;
 	}
-	int client_st = 0;//client¶Ësocket
+	int client_st = 0; //clientç«¯socket
 	//socklen_t len = 0;
-	struct sockaddr_in client_addr;//±íÊ¾client¶ËµÄIPµØÖ·
+	struct sockaddr_in client_addr; //è¡¨ç¤ºclientç«¯çš„IPåœ°å€
 	//void *p = &client_addr;
 
 	pthread_t thrd1, thrd2;
-    signal1(SIGINT,catch_Signal);
+	setsignal(SIGINT, catch_Signal);
 	printf("SYS  MSG:SERVER START UP  \n");
 	while (1)
 	{
 		memset(&client_addr, 0, sizeof(client_addr));
 		socklen_t len = sizeof(client_addr);
-		//accept»á×èÈû£¬Ö±µ½ÓĞ¿Í»§¶ËÁ¬½Ó¹ıÀ´£¬accept·µ»ØclientµÄsocketÃèÊö·û
-		client_st = accept(st, (struct sockaddr *)&client_addr , &len);
-		pthread_mutex_lock(&mutex);//ÎªÈ«¾Ö±äÁ¿¼ÓÒ»¸ö»¥³âËø£¬·ÀÖ¹ÓëÏß³Ìº¯ÊıÍ¬Ê±¶ÁĞ´±äÁ¿µÄ³åÍ»
-		printf("SYS  MSG:User Login,Online User: %d\n",status);status++; 
-		pthread_mutex_unlock(&mutex);//½âËø
-		if (status > 3)//´ú±íÕâÊÇÏÂÒ»¸ösocketÁ¬½Ó
+		//acceptä¼šé˜»å¡ï¼Œç›´åˆ°æœ‰å®¢æˆ·ç«¯è¿æ¥è¿‡æ¥ï¼Œacceptè¿”å›clientçš„socketæè¿°ç¬¦
+		client_st = accept(st, (struct sockaddr *)&client_addr, &len);
+		pthread_mutex_lock(&mutex); //ä¸ºå…¨å±€å˜é‡åŠ ä¸€ä¸ªäº’æ–¥é”ï¼Œé˜²æ­¢ä¸çº¿ç¨‹å‡½æ•°åŒæ—¶è¯»å†™å˜é‡çš„å†²çª
+		printf("SYS  MSG:User Login,Online User: %d\n", status);
+		status++;
+		pthread_mutex_unlock(&mutex); //è§£é”
+		if (status > 3)				  //ä»£è¡¨è¿™æ˜¯ä¸‹ä¸€ä¸ªsocketè¿æ¥
 		{
-		    char tip[] = "The Number Of Users Is Limited.Please Wait.\n";
-		    send(client_st, tip, strlen(tip), 0);
+			char tip[] = "The Number Of Users Is Limited.Please Wait.\n";
+			send(client_st, tip, strlen(tip), 0);
 			close(client_st);
-			pthread_mutex_lock(&mutex);//ÎªÈ«¾Ö±äÁ¿¼ÓÒ»¸ö»¥³âËø£¬·ÀÖ¹ÓëÏß³Ìº¯ÊıÍ¬Ê±¶ÁĞ´±äÁ¿µÄ³åÍ»
-			status--; printf("SYS  MSG:Online User: %d\n",status);
-			pthread_mutex_unlock(&mutex);//½âËø
+			pthread_mutex_lock(&mutex); //ä¸ºå…¨å±€å˜é‡åŠ ä¸€ä¸ªäº’æ–¥é”ï¼Œé˜²æ­¢ä¸çº¿ç¨‹å‡½æ•°åŒæ—¶è¯»å†™å˜é‡çš„å†²çª
+			status--;
+			printf("SYS  MSG:Online User: %d\n", status);
+			pthread_mutex_unlock(&mutex); //è§£é”
 			continue;
 		}
 
@@ -192,19 +193,19 @@ int main(int arg, char *args[])
 			return EXIT_FAILURE;
 		}
 
-		printf("SYS  MSG:Accept by client_IP:%s\n",inet_ntoa(client_addr.sin_addr));
+		printf("SYS  MSG:Accept by client_IP:%s\n", inet_ntoa(client_addr.sin_addr));
 		struct ps ps1;
 		ps1.st = client_st;
 		ps1.thr = &thrd2;
 		pthread_create(&thrd1, NULL, recvsocket, &ps1);
 		pthread_detach(thrd1);
-		//ÉèÖÃÏß³ÌÎª¿É·ÖÀë
+		//è®¾ç½®çº¿ç¨‹ä¸ºå¯åˆ†ç¦»
 		pthread_create(&thrd2, NULL, sendsocket, &client_st);
 		pthread_detach(thrd2);
-		//ÉèÖÃÏß³ÌÎª¿É·ÖÀë
+		//è®¾ç½®çº¿ç¨‹ä¸ºå¯åˆ†ç¦»
 	}
 	close(st);
-	//¹Ø±Õserver¶ËlistenµÄsocket
-	
+	//å…³é—­serverç«¯listençš„socket
+
 	return EXIT_SUCCESS;
 }
