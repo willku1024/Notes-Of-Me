@@ -1,0 +1,104 @@
+﻿#include <stdio.h>
+
+//通过IDE（Integrated Development Environment），讲解GCC
+//静态语言和动态语言:预编译---编译---链接---装载mem---运行
+//建立内存映像
+//建立一级指针模型，图
+int  main()
+{
+	int a=5;
+	int *p=&a;
+	//int *p;
+	//p=&a;
+	int **pp=&p;
+	//int *pp;
+	//pp=&p;
+
+	printf("1---&a:    %d\n",&a);        //a的地址--&a
+	printf("2---a:     %d\n",a);         //a的值5
+                                 
+	printf("3---&p:    %d\n",&p);        //p的地址--&p
+	printf("4---p:     %d\n",p);         //a的地址--&a
+	printf("5---*p:    %d\n",*p);        //a的值5
+                                 
+	printf("6---&pp:   %d\n",&pp);       //pp的地址--&pp
+	printf("7---pp:    %d\n",pp);        //p的地址--&p
+	printf("8---*pp:   %d\n",*pp);       //a的地址--&a
+	printf("9---**pp:  %d\n",**pp);      //a的值5
+
+    //结论：2-5-9 ,1-4-8, 3-7, 6
+
+	//问题1
+	//&*p,*&p
+	
+	//问题2
+
+	/*
+	int a=5;
+	int *p=&a;
+    如果 int **pp; pp=&p;  
+	那么 *pp=？ 和 **pp=？
+	
+	
+	//or pp=p
+	*/
+	
+	
+	//问题3
+	//int **pp=&a or **pp=a
+	//那么，*pp？ **pp?
+	return 0;
+}
+
+////////////////////////////一级指针的传参---做输出/////////////////////////////////////////////
+#include <stdio.h>
+#include <malloc.h>
+
+void
+//fun(int *a)
+fun(int a[])
+{
+
+	printf("a[0]:%d \n", a[0]);
+	//重要！！
+	return ;
+
+}
+
+int  main()
+{
+	int *arr;
+
+	arr = (int *)malloc(sizeof(int)*1);
+	//arr[0] = 8;
+	*(arr+0) = 8;
+	fun(arr);
+	return 0;
+}
+
+////////////////////////////一级指针的传参---做输入/////////////////////////////////////////////
+#include <stdio.h>
+#include <malloc.h>
+
+
+void
+//fun(int *a)
+fun(int a[])
+{
+	
+	arr[0] = 8;
+	arr[1] = 88;
+    return ;
+}
+
+int  main()
+{
+	int *arr;
+	
+	arr = malloc(4*2);
+	fun(arr);
+	printf("a[0]:%d\n a[1]:%d \n", a[0],a[1]);
+	
+	free(arr);
+	return 0;
+}

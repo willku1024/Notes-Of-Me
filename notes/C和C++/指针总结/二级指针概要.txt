@@ -1,0 +1,128 @@
+#include <stdio.h>
+#include <malloc.h>
+#include <string.h>
+#include <windows.h>
+
+//静态和动态数组
+//理解什么是函数？malloc--free 函数和new--delete 的区别
+//二维数组模型，图
+//利用二维数组指针建立动态数组（建立，回收）
+//main参数的高级用法
+
+int  main()
+{
+
+    int **arr = NULL;
+
+    int row = 0,col = 0;
+    printf("请输入row：\n");
+    scanf("%d",&row);
+    printf("请输入col：\n");
+    scanf("%d",&col);
+
+
+    arr = (int **)malloc(sizeof(int *)*row);
+
+
+    //建立
+    int i,j;
+    for(i = 0; i < row; i++)
+    {
+        //解释arr[i] , *(arr+i),规律 arr[x] <==> *(arr+x)
+        arr[i] = (int *)malloc(sizeof(int)*col);
+    }
+
+    //赋值使用
+    for(i = 0; i < row; i++)
+    {
+        for(j = 0; j < col; j++)
+            // *(*(arr+i)+j)
+            // *(arr[i]+j)
+            // (*(arr+i))[j]
+            arr[i][j] = i*col + j;
+
+    }
+
+
+    //打印验证
+    printf("\n打印验证如下：\n");
+    for(i = 0; i < row; i++)
+    {
+        for(j = 0; j < col; j++)
+            // *(*(a+i)+j)
+            // *(a[i]+j)
+            // (*(arr+i))[j]
+            printf("%d\t",(*(arr+i))[j]);
+
+
+        printf("\n");
+    }
+
+
+    system("echo 按任意键开始跟踪内存释放 && pause>nul && echo ------------ ");
+    //释放每一row
+    for(i = 0; i < row; i++)
+    {
+        //解释arr[i] , *(arr+i)
+        free (arr[i]);
+        printf("释放arr[%d]行的数据\n",i);
+    }
+
+
+    //释放arr本身
+    free(arr);
+    arr = NULL;
+    printf("释放arr本身,并置为NULL\n");
+    //问题1：如果出错 arr = (int *)malloc(sizeof(int *)*row)
+    //写成 arr = (int *)malloc(sizeof(int)*row) 会怎么样？
+
+
+    return 0;
+}
+
+////////////////////////////二级指针的传参----1/////////////////////////////////////////////
+#include <stdio.h>
+#include <malloc.h>
+
+void
+//fun(int *a)
+fun(int **a)
+{
+	*a = (int *)malloc(4*2);
+	
+	return ;
+}
+
+int  main()
+{
+	int *arr;
+    fun(&arr);
+	a[0] = 8;
+	a[1] = 88;
+	printf("a[0]:%d\na[1]:%d \n", arr[0],arr[1]);
+
+	return 0;
+}
+////////////////////////////二级指针的传参----2/////////////////////////////////////////////
+#include <stdio.h>
+#include <malloc.h>
+
+void
+//fun(int *a)
+fun(int **a)
+{
+	*a = (int *)malloc(4*2);
+	(*a)[0] = 8;
+	(*a)[1] = 88;
+	return ;
+}
+
+int  main()
+{
+	int *arr;
+    fun(&arr);
+
+	printf("a[0]:%d\na[1]:%d \n", arr[0],arr[1]);
+
+	return 0;
+}

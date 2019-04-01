@@ -1,0 +1,16 @@
+
+
+ 源文件经过预处理器，完成预编译，生成预编译.i文件
+ gcc -o hello.i -E  hello.c 
+ 
+ 预编译文件经过编译器，完成编译，生成汇编.s文件
+ gcc -o hello.s -S hello.i
+ 
+ 汇编文件进过汇编器，生成.o目标文件
+ gcc -o hello.o -c hello.s
+ 
+ 多个目标文件经过链接器，完成链接，生成可执行文件
+ gcc -o hello.exe  hello.o
+
+ .c直接生成可执行文件
+ gcc -o hello.exe  hello.c

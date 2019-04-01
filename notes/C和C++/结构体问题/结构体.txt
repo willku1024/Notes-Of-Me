@@ -1,0 +1,120 @@
+
+
+/*
+1，struct结构体,union联合体，各自出现的原因
+2，平台大小字节序，面试题
+3，struct、union联合体，面试题
+4，TCP有限状态机
+   主被动套接字
+   三次握手
+   四次释放
+   
+5，socket编程5大函数
+
+①
+server端：
+socket()
+bind()
+listen()
+accept()
+
+client端：
+connect()
+
+②
+阻塞和非阻塞函数
+
+
+6，C/S架构模型
+c:Qt---C++
+s:Linux---C
+
+
+*/
+
+#include <stdio.h>
+#include <string.h>
+union info1
+{
+	char teacher_id[6];
+	char student_id[11];
+	
+};
+
+
+union info2
+{
+	int  teacher_id;
+	long student_id;
+	
+};
+
+struct teacher
+{
+	int tAge;
+	//char tName[10];
+
+};
+
+
+
+typedef struct student
+{
+	int sAge;
+	//char sName[10];
+
+}st;
+
+typedef struct
+{
+	int sAge;
+	//char sName[10];
+
+}ST;
+
+int main_union()
+{
+	union info1 Info;
+	strcpy(Info.teacher_id,"12345");
+	puts(Info.teacher_id);
+	puts(Info.student_id);
+	strcpy(Info.student_id,"1234567890");
+	puts(Info.teacher_id);
+	puts(Info.student_id);
+	
+	/* 
+	union info2 Info;
+	Info.teacher_id = 0x10203040;
+	printf("s:%ld\n",Info.student_id);
+	printf("t:%d\n",Info.teacher_id);
+	Info.student_id = 0x11223344;
+    printf("s:%ld\n",Info.student_id);
+	printf("t:%d\n",Info.teacher_id); 
+	*/
+	
+	
+	//问题1:如果学生/老师的信息变为int，long是什么结果
+	
+	//问题2：如果学生的信息为id和class而老师的信息仍然为id，怎么处理
+	
+	return 0;
+
+}
+
+int main_struct()
+{
+	struct teacher teacher_li;
+	st student_zhang;
+	ST student_wang;
+    struct student s;
+
+    teacher_li.tAge = 18;
+    student_zhang.sAge = 10;
+    student_wang.sAge = 8;
+    s.sAge = 1;
+
+    printf("%d,%d,%d,%d\n",teacher_li.tAge,student_zhang.sAge,
+           student_wang.sAge,s.sAge);
+
+	return 0;
+}
