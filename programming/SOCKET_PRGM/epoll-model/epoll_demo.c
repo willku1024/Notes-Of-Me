@@ -1,28 +1,43 @@
 /*
-函数原型:
-int select(int nfds,fd_set *writefds, fd_set *exceptfds,struct timeval *timeout); 
-参数:
-○ nfds: 要检测的文件描述中最大的fd+1 - 1024
-○ readfds: 读集合
-○ writefds: 写集合
-○ exceptfds: 异常集合
-○ timeout:
-     NULL: 永久阻塞
-    □ 当检测到fd变化的时候返回  struct timeval a;
-    □ a.tv_sec = 10; □ a.tv_usec = 0;
+epoll三个函数:
+1、该函数生成一个epoll专用的文件描述符
+○ int epoll_create(int size);
+     size: epoll上能关注的最大描述符数
 
-- 全部清空
-○ void FD_ZERO(fd_set *set);
-- 从集合中删除某一项
-○ void FD_CLR(int fd, fd_set *set);
-- 将某个文件描述符添加到集合
-○ void FD_SET(int fd, fd_set *set);
-- 判断某个文件描述符是否在集合中 ○ int FD_ISSET(int fd, fd_set *set);
-使用select函的优缺点: - 优点:
-○ 跨平台 - 缺点:
-○ 每次调用select，都需要把fd集合从用户态拷贝 到内核态，这个开销在fd很多时会很大
-○ 同时每次调用select都需要在内核遍历传递进来 的所有fd，这个开销在fd很多时也很大
-○ select支持的文件描述符数量太小了，默认是 1024
+2、用于控制某个epoll文件描述符事件，可以注 册、修改、删除
+○ int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event);
+     epfd: epoll_create生成的epoll专用描述符 
+     op:
+        □ EPOLL_CTL_ADD -- 注册 
+        □ EPOLL_CTL_MOD -- 修改 
+        □ EPOLL_CTL_DEL -- 删除
+     fd: 关联的文件描述符
+     event: 告诉内核要监听什么事件 - 等待IO事件发生 - 可以设置阻塞的函数
+    typedef union epoll_data {
+        void        *ptr;
+        int          fd;
+        uint32_t     u32;
+        uint64_t     u64;
+    } epoll_data_t;
+
+    struct epoll_event {
+        uint32_t     events;      // Epoll events: EPOLLIN - 读、EPOLLOUT - 写、EPOLLERR - 异常
+        epoll_data_t data;        // User data variable 
+    };
+
+3、int epoll_wait(
+    int epfd,   // epoll_create 创建的句柄
+    struct epoll_event* events, // 数组 
+    int maxevents,
+    int timeout
+);
+     epfd: 要检测的句柄
+     events:用于回传待处理事件的数组
+     maxevents:告诉内核这个events的大小 
+     timeout:为超时时间
+        □ -1: 永久阻塞 
+        □ 0: 无活跃fd，立即返回 
+        □ >0: 活跃fd数目
 */
 
 #include <stdlib.h>
@@ -32,15 +47,17 @@ int select(int nfds,fd_set *writefds, fd_set *exceptfds,struct timeval *timeout)
 #include <string.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include <netinet/ip.h> /* superset of previous */
+#include <netinet/ip.h>
 #include <sys/select.h>
 #include <arpa/inet.h>
 #include <errno.h>
+#include <sys/epoll.h>
 
 #define LISTEN_BACKLOG 50
 #define handle_error(msg)   \
     do                      \
     {                       \
+        printf("%d,",__LINE__);\
         perror(msg);        \
         exit(EXIT_FAILURE); \
     } while (0)
@@ -98,41 +115,35 @@ int main(int argc, char *argv[])
     int on = 1;
     setsockopt(sfd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
 
-    if (bind(sfd, (struct sockaddr *)&my_addr, sizeof(struct sockaddr_in)) == -1)
+    if (bind(sfd, (struct sockaddr *) &my_addr, sizeof(struct sockaddr_in)) == -1)
         handle_error("bind");
 
     if (listen(sfd, LISTEN_BACKLOG) == -1)
         handle_error("listen");
 
-    fd_set rfds, tmpfds;
 
-    FD_ZERO(&rfds);
+    int epfd = epoll_create(10);
 
-    FD_SET(sfd, &rfds);
-
-    int maxfd = sfd;
+    struct epoll_event ev, events[200];
+    ev.events = EPOLLIN;
+    ev.data.fd = sfd;
+    epoll_ctl(epfd, EPOLL_CTL_ADD, sfd, &ev);
 
     while (1)
     {
-        tmpfds = rfds;
-        puts("select wait:");
-        int retval = select(maxfd + 1, &tmpfds, NULL, NULL, NULL);
+        int ret = epoll_wait(epfd, events, sizeof(events) / sizeof(events[0]), -1);
+        if (ret == -1)
+            handle_error("epoll_wait err");
 
-        if (retval == -1)
+        for (int i = 0; i < ret; ++i)
         {
-            perror("select()");
-            break;
-        }
-        else if (retval)
-        {
-
-            if (FD_ISSET(sfd, &tmpfds))
+            int fd = events[i].data.fd;
+            if (fd == sfd)
             {
-
                 struct sockaddr_in peer_addr;
                 socklen_t peer_addr_size;
                 peer_addr_size = sizeof(struct sockaddr_in);
-                cfd = accept(sfd, (struct sockaddr *)&peer_addr, &peer_addr_size);
+                cfd = accept(sfd, (struct sockaddr *) &peer_addr, &peer_addr_size);
 
                 if (cfd == -1)
                     handle_error("accept");
@@ -142,25 +153,27 @@ int main(int argc, char *argv[])
                        inet_ntop(AF_INET, &peer_addr.sin_addr, ip, sizeof(ip)), ntohs(peer_addr.sin_port));
 
                 active_nonblock(cfd);
-                FD_SET(cfd, &rfds);
-                // update max fd
-                maxfd = maxfd > cfd ? maxfd : cfd;
-            }
 
-            for (int i = sfd + 1; i < maxfd + 1; ++i)
+                ev.events = EPOLLIN;
+                ev.data.fd = cfd;
+                if (epoll_ctl(epfd, EPOLL_CTL_ADD, cfd, &ev) < 0)
+                    handle_error("epoll_ctl error");
+            } else
             {
-                if (FD_ISSET(i, &tmpfds))
+                // can read event
+                if (events[i].events & EPOLLIN)
                 {
+
                     // do some sth
-                    char buf[1024] = {0};
+                    char buf[2] = {0};
                     int n = 0;
-                    while ((n = read(i, buf, 1)))
+                    while ((n = read(fd, buf, 1)))
                     {
+
                         if (n > 0)
                         {
                             printf("%s", buf);
-                        }
-                        else
+                        } else
                         {
                             // no data can read
                             if (errno == EAGAIN || errno == EWOULDBLOCK)
@@ -174,20 +187,13 @@ int main(int argc, char *argv[])
                     {
                         printf("read EOF, client quit\n");
                         deactive_nonblock(i);
-                        if (maxfd == i)
-                        {
-                            maxfd--;
-                        }
-                        FD_CLR(i, &rfds);
+                        if (epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL) < 0)
+                            handle_error("epoll_ctl error");
                         close(i);
                     }
                 }
             }
-        }
-        else
-        {
-            // printf("No data within five seconds.\n");
-            continue;
+
         }
     }
 
