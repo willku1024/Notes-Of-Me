@@ -38,8 +38,37 @@ epoll三个函数:
         □ -1: 永久阻塞 
         □ 0: 无活跃fd，立即返回 
         □ >0: 活跃fd数目
-*/
 
+3 - epoll三种工作模式
+1. 水平触发模式 - 根据读来解释
+    ○ 只要fd对应的缓冲区有数据
+    ○ epoll_wait返回
+    ○ 返回的次数与发送数据的次数没有关系 ○ epoll默认的工作模式 server
+
+2. 边沿触发模式 - ET
+    ○ fd - 默认阻塞属性
+    ○ 客户端给server发数据:
+        client epoll_wait 调用次数越多, 系统的开销越大
+         发一次数据server 的 epoll_wait返回 一次
+         不在乎数据是否读完
+         如果读不完, 如何全部读出来?
+        □ while(recv());
+         数据读完之后recv会阻塞 
+         解决阻塞问题
+            ◊ 设置非阻塞 - fd
+3. 边沿非阻塞触发
+    ○ 效率最高
+    ○ 如何设置非阻塞
+         open()
+            □ 设置flags
+            □ 必须 O_WDRW | O_NONBLOCK 
+            □ 终端文件: /dev/tty
+         fcntl
+            □ int flag = fcntl(fd, F_GETFL); 
+            □ flag |= O_NONBLOCK;
+            □ fcntl(fd, F_SETFL, flag);
+
+*/
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -125,12 +154,13 @@ int main(int argc, char *argv[])
     int epfd = epoll_create(10);
 
     struct epoll_event ev, events[200];
-    ev.events = EPOLLIN;
+    ev.events = EPOLLIN | EPOLLET;
     ev.data.fd = sfd;
     epoll_ctl(epfd, EPOLL_CTL_ADD, sfd, &ev);
 
     while (1)
     {
+        puts("epoll wait");
         int ret = epoll_wait(epfd, events, sizeof(events) / sizeof(events[0]), -1);
         if (ret == -1)
             handle_error("epoll_wait err");
@@ -154,7 +184,7 @@ int main(int argc, char *argv[])
 
                 active_nonblock(cfd);
 
-                ev.events = EPOLLIN;
+                ev.events = EPOLLIN | EPOLLET;
                 ev.data.fd = cfd;
                 if (epoll_ctl(epfd, EPOLL_CTL_ADD, cfd, &ev) < 0)
                     handle_error("epoll_ctl error");
@@ -167,29 +197,29 @@ int main(int argc, char *argv[])
                     // do some sth
                     char buf[2] = {0};
                     int n = 0;
-                    while ((n = read(fd, buf, 1)))
+                    while ((n = read(fd, buf, 1)) > 0)
                     {
+                        // do some things
+                        printf("%s", buf);
 
-                        if (n > 0)
-                        {
-                            printf("%s", buf);
-                        } else
-                        {
-                            // no data can read
-                            if (errno == EAGAIN || errno == EWOULDBLOCK)
-                                break;
-                            else
-                                puts("read error");
-                        }
+                        // write data to client
                     }
-
-                    if (n == 0)
+                    
+                    if (n == 0) // client quit
                     {
                         printf("read EOF, client quit\n");
                         deactive_nonblock(i);
                         if (epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL) < 0)
                             handle_error("epoll_ctl error");
                         close(i);
+
+                    } else if (n == -1) // no data can read or error
+                    {
+                        // no data can read
+                        if (errno == EAGAIN || errno == EWOULDBLOCK)
+                            continue;
+                        else
+                            puts("read error");
                     }
                 }
             }
