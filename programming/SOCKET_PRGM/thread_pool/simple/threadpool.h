@@ -21,7 +21,7 @@ threadpool_t *threadpool_create(int min_thr_num, int max_thr_num, int queue_max_
  * @param argument Argument to be passed to the function.
  * @return 0 if all goes well,else -1
  */
-int threadpool_add(threadpool_t *pool, void*(*function)(void *arg), void *arg);
+int threadpool_add(threadpool_t *pool, void*(*function)(void *), void *arg);
 
 /**
  * @function threadpool_destroy
